@@ -1,0 +1,830 @@
+/* ==========================================================================
+   IPL Scoring Panel Styles — Appended to style.css
+   Real-time ball-by-ball scoring interface
+   ========================================================================== */
+
+/* ─────────────────────────────────────────────
+   BACK BUTTON
+───────────────────────────────────────────── */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  padding: 9px 16px;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: all var(--dur-base) var(--ease);
+  margin-bottom: 20px;
+}
+
+.back-btn:hover {
+  background: var(--bg-glass-hover);
+  color: var(--text-0);
+  border-color: rgba(255,255,255,0.15);
+  transform: translateX(-3px);
+}
+
+.back-btn i { font-size: 0.8rem; }
+
+/* ─────────────────────────────────────────────
+   IPL SCORING MODAL OVERLAY
+───────────────────────────────────────────── */
+.ipl-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  z-index: 2000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-base) var(--ease);
+}
+
+.ipl-modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ─────────────────────────────────────────────
+   IPL SCORING PANEL (FULL SCREEN)
+───────────────────────────────────────────── */
+.ipl-panel {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow-y: auto;
+  transform: translateY(30px);
+  transition: transform var(--dur-base) var(--ease-spring);
+}
+
+.ipl-modal-overlay.active .ipl-panel {
+  transform: translateY(0);
+}
+
+/* IPL Header Bar */
+.ipl-header {
+  background: rgba(7,10,15,0.95);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.ipl-header-title {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ipl-header-title h2 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text-0);
+}
+
+.ipl-header-title span {
+  font-size: 0.75rem;
+  color: var(--text-3);
+}
+
+.ipl-header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.ipl-close-btn {
+  background: rgba(255,69,58,0.1);
+  border: 1px solid rgba(255,69,58,0.25);
+  color: var(--red);
+  padding: 9px 18px;
+  border-radius: 50px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-body);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  transition: all var(--dur-fast) var(--ease);
+}
+
+.ipl-close-btn:hover {
+  background: rgba(255,69,58,0.2);
+}
+
+/* IPL Body */
+.ipl-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 0;
+  min-height: 0;
+  background: var(--bg-app);
+}
+
+/* ─────────────────────────────────────────────
+   IPL LEFT: SCORING SECTION
+───────────────────────────────────────────── */
+.ipl-left {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+}
+
+/* Big Score Display */
+.ipl-score-display {
+  background: linear-gradient(135deg, rgba(0,214,143,0.06) 0%, rgba(0,0,0,0) 60%);
+  border: 1px solid rgba(0,214,143,0.15);
+  border-radius: var(--r-xl);
+  padding: 28px 32px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.ipl-score-display::before {
+  content: '';
+  position: absolute;
+  top: -40px; left: 50%;
+  transform: translateX(-50%);
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,214,143,0.08), transparent 70%);
+}
+
+.ipl-batting-team {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--green);
+  margin-bottom: 8px;
+}
+
+.ipl-total-score {
+  font-family: var(--font-display);
+  font-size: 4rem;
+  font-weight: 900;
+  color: var(--text-0);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  position: relative;
+}
+
+.ipl-total-score .ipl-wickets {
+  font-size: 2.2rem;
+  color: var(--red);
+}
+
+.ipl-overs-crr {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  font-size: 0.9rem;
+  color: var(--text-2);
+}
+
+.ipl-overs-crr strong { color: var(--text-0); }
+
+.ipl-crr-badge {
+  background: rgba(251,191,36,0.1);
+  border: 1px solid rgba(251,191,36,0.2);
+  color: var(--gold);
+  padding: 4px 12px;
+  border-radius: 50px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+/* This Over Ball Visualization */
+.ipl-over-section {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 20px;
+}
+
+.ipl-over-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-3);
+  margin-bottom: 14px;
+}
+
+.ipl-over-balls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.ipl-ball {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: var(--bg-glass);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.88rem;
+  color: var(--text-3);
+  transition: all var(--dur-fast) var(--ease);
+  flex-shrink: 0;
+}
+
+.ipl-ball.empty {
+  border-style: dashed;
+  background: transparent;
+}
+
+.ipl-ball.dot-ball { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); color: var(--text-2); }
+.ipl-ball.run-1   { background: rgba(10,132,255,0.15); border-color: rgba(10,132,255,0.4); color: #4da6ff; }
+.ipl-ball.run-2   { background: rgba(10,132,255,0.2); border-color: rgba(10,132,255,0.5); color: #4da6ff; }
+.ipl-ball.run-3   { background: rgba(10,132,255,0.25); border-color: rgba(10,132,255,0.6); color: #4da6ff; }
+.ipl-ball.run-4   { background: rgba(0,214,143,0.15); border-color: rgba(0,214,143,0.4); color: var(--green); }
+.ipl-ball.run-6   { background: rgba(251,191,36,0.15); border-color: rgba(251,191,36,0.4); color: var(--gold); }
+.ipl-ball.wicket  { background: rgba(255,69,58,0.15); border-color: rgba(255,69,58,0.4); color: var(--red); }
+.ipl-ball.wide    { background: rgba(191,90,242,0.15); border-color: rgba(191,90,242,0.4); color: var(--purple); }
+.ipl-ball.noball  { background: rgba(255,149,0,0.15); border-color: rgba(255,149,0,0.4); color: #ff9500; }
+.ipl-ball.bye     { background: rgba(100,100,100,0.2); border-color: rgba(150,150,150,0.3); color: var(--text-2); }
+
+.ipl-over-number {
+  font-size: 0.75rem;
+  color: var(--text-3);
+  margin-left: 6px;
+}
+
+/* Ball Action Buttons - Main Grid */
+.ipl-ball-actions {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 20px;
+}
+
+.ipl-ball-actions-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-3);
+  margin-bottom: 16px;
+}
+
+.ipl-btn-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.ipl-btn-grid.extras-row {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.ipl-action-btn {
+  padding: 18px 8px;
+  border-radius: var(--r-md);
+  border: 2px solid var(--border);
+  background: var(--bg-glass);
+  color: var(--text-1);
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 900;
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease-spring);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  line-height: 1;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.ipl-action-btn .btn-sublabel {
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  font-family: var(--font-body);
+}
+
+.ipl-action-btn:active {
+  transform: scale(0.92);
+}
+
+.ipl-action-btn:hover {
+  transform: translateY(-3px) scale(1.03);
+  border-color: rgba(255,255,255,0.2);
+}
+
+.ipl-action-btn.btn-dot {
+  background: rgba(255,255,255,0.04);
+  border-color: rgba(255,255,255,0.1);
+  color: var(--text-2);
+}
+.ipl-action-btn.btn-dot:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.07); }
+
+.ipl-action-btn.btn-1 { background: rgba(10,132,255,0.08); border-color: rgba(10,132,255,0.25); color: #5ab4ff; }
+.ipl-action-btn.btn-1:hover { background: rgba(10,132,255,0.18); border-color: rgba(10,132,255,0.5); box-shadow: 0 8px 24px rgba(10,132,255,0.2); }
+
+.ipl-action-btn.btn-2 { background: rgba(10,132,255,0.1); border-color: rgba(10,132,255,0.3); color: #5ab4ff; }
+.ipl-action-btn.btn-2:hover { background: rgba(10,132,255,0.22); border-color: rgba(10,132,255,0.55); box-shadow: 0 8px 24px rgba(10,132,255,0.2); }
+
+.ipl-action-btn.btn-3 { background: rgba(10,132,255,0.12); border-color: rgba(10,132,255,0.35); color: #5ab4ff; }
+.ipl-action-btn.btn-3:hover { background: rgba(10,132,255,0.25); border-color: rgba(10,132,255,0.6); box-shadow: 0 8px 24px rgba(10,132,255,0.2); }
+
+.ipl-action-btn.btn-4 {
+  background: rgba(0,214,143,0.1);
+  border-color: rgba(0,214,143,0.3);
+  color: var(--green);
+  font-size: 1.8rem;
+}
+.ipl-action-btn.btn-4:hover { background: rgba(0,214,143,0.2); border-color: rgba(0,214,143,0.6); box-shadow: 0 8px 24px rgba(0,214,143,0.25); }
+
+.ipl-action-btn.btn-6 {
+  background: rgba(251,191,36,0.1);
+  border-color: rgba(251,191,36,0.3);
+  color: var(--gold);
+  font-size: 1.8rem;
+}
+.ipl-action-btn.btn-6:hover { background: rgba(251,191,36,0.2); border-color: rgba(251,191,36,0.6); box-shadow: 0 8px 24px rgba(251,191,36,0.3); }
+
+.ipl-action-btn.btn-out {
+  background: rgba(255,69,58,0.1);
+  border-color: rgba(255,69,58,0.3);
+  color: var(--red);
+  font-size: 1.1rem;
+}
+.ipl-action-btn.btn-out:hover { background: rgba(255,69,58,0.2); border-color: rgba(255,69,58,0.6); box-shadow: 0 8px 24px rgba(255,69,58,0.25); }
+
+.ipl-action-btn.btn-wide {
+  background: rgba(191,90,242,0.08);
+  border-color: rgba(191,90,242,0.25);
+  color: var(--purple);
+  font-size: 0.95rem;
+}
+.ipl-action-btn.btn-wide:hover { background: rgba(191,90,242,0.18); border-color: rgba(191,90,242,0.5); box-shadow: 0 8px 24px rgba(191,90,242,0.2); }
+
+.ipl-action-btn.btn-nb {
+  background: rgba(255,149,0,0.08);
+  border-color: rgba(255,149,0,0.25);
+  color: #ff9500;
+  font-size: 0.95rem;
+}
+.ipl-action-btn.btn-nb:hover { background: rgba(255,149,0,0.18); border-color: rgba(255,149,0,0.5); box-shadow: 0 8px 24px rgba(255,149,0,0.2); }
+
+.ipl-action-btn.btn-bye {
+  background: rgba(100,100,100,0.1);
+  border-color: rgba(150,150,150,0.2);
+  color: var(--text-2);
+  font-size: 0.95rem;
+}
+.ipl-action-btn.btn-bye:hover { background: rgba(120,120,120,0.2); }
+
+.ipl-action-btn.btn-lb {
+  background: rgba(100,100,100,0.1);
+  border-color: rgba(150,150,150,0.2);
+  color: var(--text-2);
+  font-size: 0.95rem;
+}
+.ipl-action-btn.btn-lb:hover { background: rgba(120,120,120,0.2); }
+
+/* Disabled state */
+.ipl-action-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Undo Button */
+.ipl-undo-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 6px;
+}
+
+.ipl-undo-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-3);
+  padding: 7px 14px;
+  border-radius: 50px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-body);
+  transition: all var(--dur-fast) var(--ease);
+}
+
+.ipl-undo-btn:hover {
+  color: var(--text-1);
+  border-color: rgba(255,255,255,0.15);
+}
+
+/* ─────────────────────────────────────────────
+   IPL RIGHT: LIVE STATS PANEL
+───────────────────────────────────────────── */
+.ipl-right {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  overflow-y: auto;
+  background: rgba(0,0,0,0.25);
+}
+
+/* Setup Panel */
+.ipl-setup-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ipl-setup-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--green);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ipl-setup-title i { font-size: 0.7rem; }
+
+.ipl-setup-group {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ipl-setup-group-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 2px;
+}
+
+.ipl-select {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 10px 14px;
+  color: var(--text-1);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  transition: all var(--dur-fast) var(--ease);
+  cursor: pointer;
+}
+
+.ipl-select:focus { outline: none; border-color: var(--border-focus); }
+.ipl-select option { background: #141920; }
+
+.ipl-start-btn {
+  background: linear-gradient(135deg, var(--green) 0%, var(--green-dim) 100%);
+  color: #000;
+  border: none;
+  border-radius: var(--r-md);
+  padding: 14px;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all var(--dur-base) var(--ease-spring);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  box-shadow: 0 4px 20px rgba(0,214,143,0.25);
+  margin-top: 6px;
+}
+
+.ipl-start-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,214,143,0.4); }
+.ipl-start-btn:active { transform: scale(0.97); }
+
+/* Batsmen Cards */
+.ipl-batsmen-section { display: flex; flex-direction: column; gap: 10px; }
+
+.ipl-section-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 4px;
+}
+
+.ipl-batsman-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  transition: all var(--dur-fast) var(--ease);
+}
+
+.ipl-batsman-card.on-strike {
+  border-color: rgba(0,214,143,0.35);
+  background: rgba(0,214,143,0.04);
+}
+
+.ipl-batsman-info { flex: 1; min-width: 0; }
+
+.ipl-batsman-name {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text-0);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ipl-batsman-name .strike-icon {
+  color: var(--green);
+  font-size: 0.75rem;
+}
+
+.ipl-batsman-stats {
+  font-size: 0.72rem;
+  color: var(--text-3);
+  margin-top: 3px;
+}
+
+.ipl-batsman-score {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.ipl-batsman-runs {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--text-0);
+  line-height: 1;
+}
+
+.ipl-batsman-balls {
+  font-size: 0.7rem;
+  color: var(--text-3);
+  margin-top: 2px;
+}
+
+.ipl-batsman-sr {
+  font-size: 0.68rem;
+  color: var(--gold);
+  font-weight: 600;
+}
+
+/* Bowler Card */
+.ipl-bowler-card {
+  background: var(--bg-elevated);
+  border: 1px solid rgba(191,90,242,0.2);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ipl-bowler-name-label {
+  font-size: 0.7rem;
+  color: var(--purple);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+}
+
+.ipl-bowler-name {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text-0);
+}
+
+.ipl-bowler-stats {
+  font-size: 0.72rem;
+  color: var(--text-3);
+  margin-top: 3px;
+}
+
+.ipl-bowler-figures {
+  text-align: right;
+}
+
+.ipl-bowler-main-stat {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--purple);
+}
+
+/* Over Change Button */
+.ipl-end-over-btn {
+  background: rgba(191,90,242,0.1);
+  border: 1px solid rgba(191,90,242,0.3);
+  color: var(--purple);
+  padding: 11px;
+  border-radius: var(--r-sm);
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all var(--dur-base) var(--ease);
+}
+
+.ipl-end-over-btn:hover { background: rgba(191,90,242,0.2); }
+.ipl-end-over-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* Save Session Button */
+.ipl-save-btn {
+  background: linear-gradient(135deg, var(--green) 0%, var(--green-dim) 100%);
+  color: #000;
+  border: none;
+  padding: 13px;
+  border-radius: var(--r-md);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 800;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all var(--dur-base) var(--ease-spring);
+  box-shadow: 0 4px 16px rgba(0,214,143,0.25);
+}
+
+.ipl-save-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,214,143,0.4); }
+.ipl-save-btn:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+
+/* Wicket Select Overlay */
+.ipl-wicket-panel {
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,69,58,0.3);
+  border-radius: var(--r-xl);
+  padding: 24px;
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  text-align: center;
+}
+
+.ipl-wicket-panel.active { display: flex; }
+
+.ipl-wicket-panel h3 {
+  color: var(--red);
+  font-size: 1.3rem;
+  font-weight: 900;
+}
+
+.ipl-wicket-panel p {
+  font-size: 0.85rem;
+  color: var(--text-2);
+}
+
+/* Over History Mini Chips */
+.ipl-over-history {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ipl-over-chip {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--divider);
+  border-radius: var(--r-xs);
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+}
+
+.ipl-over-chip-label {
+  color: var(--text-3);
+  font-weight: 600;
+  width: 40px;
+  flex-shrink: 0;
+}
+
+.ipl-over-chip-balls { display: flex; gap: 4px; flex-wrap: wrap; }
+
+.ipl-mini-ball {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font-size: 0.6rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--border);
+  color: var(--text-3);
+}
+
+.ipl-mini-ball.r4   { background: rgba(0,214,143,0.12); border-color: rgba(0,214,143,0.3); color: var(--green); }
+.ipl-mini-ball.r6   { background: rgba(251,191,36,0.12); border-color: rgba(251,191,36,0.3); color: var(--gold); }
+.ipl-mini-ball.wkt  { background: rgba(255,69,58,0.12); border-color: rgba(255,69,58,0.3); color: var(--red); }
+.ipl-mini-ball.wd   { background: rgba(191,90,242,0.1); border-color: rgba(191,90,242,0.3); color: var(--purple); }
+.ipl-mini-ball.nb   { background: rgba(255,149,0,0.1); border-color: rgba(255,149,0,0.3); color: #ff9500; }
+
+/* IPL Score Match Button in Match Table */
+.score-match-btn {
+  background: linear-gradient(135deg, rgba(0,214,143,0.15), rgba(0,214,143,0.05));
+  border: 1px solid rgba(0,214,143,0.3);
+  color: var(--green);
+  padding: 6px 12px;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--font-body);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all var(--dur-fast) var(--ease);
+}
+
+.score-match-btn:hover {
+  background: rgba(0,214,143,0.22);
+  box-shadow: 0 4px 14px rgba(0,214,143,0.2);
+}
+
+/* Responsive IPL Panel */
+@media (max-width: 900px) {
+  .ipl-body { grid-template-columns: 1fr; }
+  .ipl-right { border-top: 1px solid var(--border); }
+  .ipl-btn-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .ipl-action-btn { padding: 14px 4px; font-size: 1.1rem; }
+  .ipl-btn-grid { gap: 7px; }
+}

@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CricOverdrive — Premium Cricket Score Management</title>
+  <meta name="description" content="Track live cricket scores, manage teams, players, and match statistics with CricOverdrive — a premium, real-time cricket scoreboard management platform.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/ipl.css">
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════
+       APP SHELL
+  ═══════════════════════════════════════════ -->
+  <div class="app-container">
+
+    <!-- ─────────── SIDEBAR ─────────── -->
+    <aside class="sidebar">
+
+      <!-- Brand -->
+      <div class="brand">
+        <div class="brand-logo-wrap">
+          <i class="fa-solid fa-cricket-bat-ball"></i>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">CricOverdrive</span>
+          <span class="brand-tag">Score Management</span>
+        </div>
+      </div>
+
+      <!-- Nav Menu -->
+      <nav class="nav-menu" aria-label="Main navigation">
+        <a href="#" class="nav-item active" data-tab="live-score" id="nav-live-score" aria-current="page">
+          <i class="fa-solid fa-tower-broadcast"></i>
+          <span>Live Scores</span>
+        </a>
+        <a href="#" class="nav-item" data-tab="teams" id="nav-teams">
+          <i class="fa-solid fa-shield-halved"></i>
+          <span>Teams</span>
+        </a>
+        <a href="#" class="nav-item" data-tab="players" id="nav-players">
+          <i class="fa-solid fa-user-ninja"></i>
+          <span>Players</span>
+        </a>
+        <a href="#" class="nav-item" data-tab="matches" id="nav-matches">
+          <i class="fa-solid fa-calendar-days"></i>
+          <span>Matches</span>
+        </a>
+        <a href="#" class="nav-item" data-tab="statistics" id="nav-statistics">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>Stats &amp; Reports</span>
+        </a>
+        <a href="#" class="nav-item" data-tab="account">
+          <i class="fa-solid fa-user"></i>
+          Account
+        </a>
+      </nav>
+
+      <!-- Sidebar User Profile (Dynamic) -->
+      <div class="sidebar-user" id="sidebarUser" style="display:none;">
+        <div class="sidebar-user-avatar" id="sidebarAvatar">?</div>
+        <div class="sidebar-user-info">
+          <span class="sidebar-user-name" id="sidebarUserName">Guest</span>
+          <span class="sidebar-user-role" id="sidebarUserRole">Not logged in</span>
+        </div>
+      </div>
+
+      <!-- Admin Status -->
+      <div class="sidebar-footer">
+        <div class="admin-status-card" id="adminStatusCard">
+          <div class="status-indicator"></div>
+          <div class="status-info">
+            <span class="status-label">Viewer Mode</span>
+            <span class="status-desc">Click to sign in as admin</span>
+          </div>
+          <button class="login-btn" id="sidebarLoginBtn" title="Admin Login" aria-label="Admin Login">
+            <i class="fa-solid fa-right-to-bracket"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ─────────── MAIN CONTENT ─────────── -->
+    <main class="main-content" role="main">
+
+      <!-- Top Action Bar -->
+      <header class="top-bar">
+        <div class="page-title-area">
+          <button class="back-btn hide" id="backBtn" onclick="navigateBack()" aria-label="Go Back">
+            <i class="fa-solid fa-arrow-left"></i> Back
+          </button>
+          <h1 id="pageTitle">Live Match Dashboard</h1>
+          <p id="pageDescription" class="page-subtitle">Real-time scores, standings, and match updates.</p>
+        </div>
+        <div class="top-bar-actions">
+          <div class="time-widget" aria-live="polite">
+            <i class="fa-solid fa-clock"></i>
+            <span id="liveTime">00:00:00</span>
+          </div>
+          <button class="primary-btn hide" id="globalAddBtn">
+            <i class="fa-solid fa-plus"></i>
+            <span id="globalAddBtnText">Add Team</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- ════════════════════════════════════════
+           TAB: LIVE SCORES
+      ════════════════════════════════════════ -->
+      <section class="tab-panel active" id="live-score-tab" aria-labelledby="nav-live-score">
+
+        <!-- Hero Banner -->
+        <div class="live-hero-banner">
+          <img src="css/hero-bg.png" alt="Cricket stadium" class="hero-bg-img" aria-hidden="true">
+          <div class="hero-content">
+            <div class="hero-label">Live Matchday</div>
+            <h2 class="hero-headline">Cricket <span>Overdrive</span></h2>
+            <p class="hero-meta" id="heroMatchCount">Loading matches...</p>
+          </div>
+          <div class="hero-stat-chips" id="heroStatChips">
+            <div class="stat-chip">
+              <span class="stat-chip-value" id="heroLiveCount">—</span>
+              <span class="stat-chip-label">Live Now</span>
+            </div>
+            <div class="stat-chip">
+              <span class="stat-chip-value" id="heroTotalCount">—</span>
+              <span class="stat-chip-label">Total Matches</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Match Cards Grid -->
+        <div class="live-matches-grid" id="liveMatchesGrid">
+          <div class="loading-spinner">
+            <i class="fa-solid fa-circle-notch fa-spin"></i>
+            Loading matches...
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           TAB: TEAMS
+      ════════════════════════════════════════ -->
+      <section class="tab-panel" id="teams-tab" aria-labelledby="nav-teams">
+        <div class="teams-grid" id="teamsGrid">
+          <!-- Dynamic Team Cards -->
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           TAB: PLAYERS
+      ════════════════════════════════════════ -->
+      <section class="tab-panel" id="players-tab" aria-labelledby="nav-players">
+        <div class="filter-bar">
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+            <input type="text" id="playerSearchInput" placeholder="Search players or teams..." aria-label="Search players">
+          </div>
+          <div class="filter-dropdowns">
+            <select id="playerTeamFilter" aria-label="Filter by team">
+              <option value="">All Teams</option>
+            </select>
+            <select id="playerRoleFilter" aria-label="Filter by role">
+              <option value="">All Roles</option>
+              <option value="batsman">Batsmen</option>
+              <option value="bowler">Bowlers</option>
+              <option value="all-rounder">All-Rounders</option>
+              <option value="wicket keeper">Wicket Keepers</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table" id="playersTable">
+            <thead>
+              <tr>
+                <th>Player</th>
+                <th>Age</th>
+                <th>Role</th>
+                <th>Team</th>
+                <th class="admin-only hide">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="playersTableBody">
+              <!-- Dynamic rows -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           TAB: MATCHES
+      ════════════════════════════════════════ -->
+      <section class="tab-panel" id="matches-tab" aria-labelledby="nav-matches">
+        <div class="filter-bar">
+          <div class="filter-dropdowns">
+            <button class="filter-tab active" data-match-filter="all" id="filterAll">All Matches</button>
+            <button class="filter-tab" data-match-filter="live" id="filterLive">
+              <i class="fa-solid fa-tower-broadcast" style="font-size:0.75rem;"></i> Live
+            </button>
+            <button class="filter-tab" data-match-filter="scheduled" id="filterScheduled">Upcoming</button>
+            <button class="filter-tab" data-match-filter="completed" id="filterCompleted">Completed</button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table" id="matchesTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Match</th>
+                <th>Venue</th>
+                <th>Status</th>
+                <th>Result</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="matchesTableBody">
+              <!-- Dynamic rows -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           TAB: SCORECARD
+      ════════════════════════════════════════ -->
+      <section class="tab-panel" id="scorecard-tab" aria-labelledby="nav-scorecard">
+
+        <div class="scorecard-header-card" id="scHeaderCard">
+          <!-- Dynamic match overview -->
+        </div>
+
+        <div class="sc-tabs" role="tablist">
+          <button class="sc-tab-btn active" id="scTeam1TabBtn" role="tab" aria-selected="true" onclick="toggleScorecardTeam(1)">Team 1</button>
+          <button class="sc-tab-btn" id="scTeam2TabBtn" role="tab" aria-selected="false" onclick="toggleScorecardTeam(2)">Team 2</button>
+        </div>
+
+        <!-- Team 1 -->
+        <div class="sc-team-section active" id="scTeam1Section" role="tabpanel">
+          <div class="sc-subsection">
+            <h3>Batting</h3>
+            <div class="table-container">
+              <table class="data-table card-table" id="scTeam1BattingTable">
+                <thead>
+                  <tr>
+                    <th>Batsman</th>
+                    <th class="num-col">Runs</th>
+                    <th class="num-col">Balls</th>
+                    <th class="num-col">4s</th>
+                    <th class="num-col">6s</th>
+                    <th class="num-col">SR</th>
+                  </tr>
+                </thead>
+                <tbody id="scTeam1BattingBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="sc-subsection">
+            <h3>Bowling</h3>
+            <div class="table-container">
+              <table class="data-table card-table" id="scTeam1BowlingTable">
+                <thead>
+                  <tr>
+                    <th>Bowler</th>
+                    <th class="num-col">Overs</th>
+                    <th class="num-col">Runs</th>
+                    <th class="num-col">Wickets</th>
+                    <th class="num-col">Economy</th>
+                  </tr>
+                </thead>
+                <tbody id="scTeam1BowlingBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Team 2 -->
+        <div class="sc-team-section" id="scTeam2Section" role="tabpanel">
+          <div class="sc-subsection">
+            <h3>Batting</h3>
+            <div class="table-container">
+              <table class="data-table card-table" id="scTeam2BattingTable">
+                <thead>
+                  <tr>
+                    <th>Batsman</th>
+                    <th class="num-col">Runs</th>
+                    <th class="num-col">Balls</th>
+                    <th class="num-col">4s</th>
+                    <th class="num-col">6s</th>
+                    <th class="num-col">SR</th>
+                  </tr>
+                </thead>
+                <tbody id="scTeam2BattingBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="sc-subsection">
+            <h3>Bowling</h3>
+            <div class="table-container">
+              <table class="data-table card-table" id="scTeam2BowlingTable">
+                <thead>
+                  <tr>
+                    <th>Bowler</th>
+                    <th class="num-col">Overs</th>
+                    <th class="num-col">Runs</th>
+                    <th class="num-col">Wickets</th>
+                    <th class="num-col">Economy</th>
+                  </tr>
+                </thead>
+                <tbody id="scTeam2BowlingBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Admin Scorecard Editor -->
+        <div class="admin-scorecard-editor admin-only hide" id="adminScorecardEditor">
+          <hr class="section-divider">
+          <h2>Update Player Performances</h2>
+          <p class="section-subtitle">Record individual scores and bowling figures for this match.</p>
+
+          <div class="editor-controls">
+            <select id="editorPlayerSelect" class="form-control">
+              <option value="">Choose a player to update...</option>
+            </select>
+          </div>
+
+          <div class="editor-grid" id="editorFormFields" style="display:none;">
+            <div class="editor-group" id="battingInputGroup">
+              <h4><i class="fa-solid fa-baseball-bat-ball" style="color:var(--green);margin-right:8px;"></i>Batting Figures</h4>
+              <div class="form-row">
+                <div class="form-col">
+                  <label for="perfRuns">Runs Scored</label>
+                  <input type="number" id="perfRuns" min="0" value="0" class="form-control">
+                </div>
+                <div class="form-col">
+                  <label for="perfBalls">Balls Faced</label>
+                  <input type="number" id="perfBalls" min="0" value="0" class="form-control">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-col">
+                  <label for="perfFours">Fours (4s)</label>
+                  <input type="number" id="perfFours" min="0" value="0" class="form-control">
+                </div>
+                <div class="form-col">
+                  <label for="perfSixes">Sixes (6s)</label>
+                  <input type="number" id="perfSixes" min="0" value="0" class="form-control">
+                </div>
+              </div>
+            </div>
+
+            <div class="editor-group" id="bowlingInputGroup">
+              <h4><i class="fa-solid fa-bowling-ball" style="color:var(--purple);margin-right:8px;"></i>Bowling Figures</h4>
+              <div class="form-row">
+                <div class="form-col">
+                  <label for="perfOvers">Overs Bowled</label>
+                  <input type="number" id="perfOvers" min="0" max="50" step="0.1" value="0.0" class="form-control" placeholder="e.g. 4.0">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-col">
+                  <label for="perfConceded">Runs Conceded</label>
+                  <input type="number" id="perfConceded" min="0" value="0" class="form-control">
+                </div>
+                <div class="form-col">
+                  <label for="perfWickets">Wickets Taken</label>
+                  <input type="number" id="perfWickets" min="0" max="10" value="0" class="form-control">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="editor-actions" id="editorFormActions" style="display:none; margin-top:16px;">
+            <button class="primary-btn" id="savePerformanceBtn">
+              <i class="fa-solid fa-floppy-disk"></i> Save Stats
+            </button>
+            <button class="secondary-btn" id="cancelPerformanceBtn" style="margin-left:10px;">
+              <i class="fa-solid fa-rotate-left"></i> Reset
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════════════════
+           TAB: STATISTICS
+      ════════════════════════════════════════ -->
+      <section class="tab-panel" id="statistics-tab" aria-labelledby="nav-statistics">
+
+        <!-- Points Table -->
+        <div class="stats-section-row">
+          <div class="stats-panel-card full-width">
+            <div class="stats-card-header">
+              <h2>Points Table Standings</h2>
+              <i class="fa-solid fa-ranking-star accent-gold" aria-hidden="true"></i>
+            </div>
+            <div class="table-container">
+              <table class="data-table points-table-element" id="pointsTable">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Team</th>
+                    <th class="num-col">Played</th>
+                    <th class="num-col">Won</th>
+                    <th class="num-col">Lost</th>
+                    <th class="num-col">Ties</th>
+                    <th class="num-col">Points</th>
+                  </tr>
+                </thead>
+                <tbody id="pointsTableBody">
+                  <!-- Dynamic rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Leaderboards -->
+        <div class="leaderboard-row">
+          <div class="stats-panel-card">
+            <div class="stats-card-header">
+              <h2>Orange Cap — Top Run Scorers</h2>
+              <i class="fa-solid fa-award orange-cap-icon" aria-hidden="true"></i>
+            </div>
+            <ul class="stats-leader-list" id="runsLeaderList"></ul>
+          </div>
+
+          <div class="stats-panel-card">
+            <div class="stats-card-header">
+              <h2>Purple Cap — Most Wickets</h2>
+              <i class="fa-solid fa-award purple-cap-icon" aria-hidden="true"></i>
+            </div>
+            <ul class="stats-leader-list" id="wicketsLeaderList"></ul>
+          </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-row">
+          <div class="stats-panel-card chart-card">
+            <div class="stats-card-header">
+              <h2>Points Distribution</h2>
+            </div>
+            <div class="chart-container">
+              <canvas id="pointsChart"></canvas>
+            </div>
+          </div>
+
+          <div class="stats-panel-card chart-card">
+            <div class="stats-card-header">
+              <h2>Team Total Runs</h2>
+            </div>
+            <div class="chart-container">
+              <canvas id="teamRunsChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- 5. ACCOUNT / AUTH TAB -->
+      <div id="account-tab" class="tab-panel">
+        
+        <!-- Not Logged In View -->
+        <div id="authFormsContainer" class="auth-container">
+          <div class="auth-box">
+            <div class="auth-header">
+              <h2>Welcome to ScoreBoard</h2>
+              <p>Sign in to manage matches and scorecards.</p>
+            </div>
+            
+            <div class="auth-tabs">
+              <button class="auth-tab-btn active" onclick="switchAuthTab('login')">Log In</button>
+              <button class="auth-tab-btn" onclick="switchAuthTab('signup')">Sign Up</button>
+              <div class="auth-tab-slider" id="authTabSlider"></div>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" style="display:flex; flex-direction:column; gap:16px;">
+              <div class="auth-form-group">
+                <label for="loginUser">Username</label>
+                <input type="text" id="loginUser" class="auth-input" placeholder="e.g. admin" required>
+              </div>
+              <div class="auth-form-group">
+                <label for="loginPass">Password</label>
+                <input type="password" id="loginPass" class="auth-input" placeholder="••••••••" required>
+              </div>
+              <button type="submit" class="auth-submit-btn">Log In</button>
+            </form>
+
+            <!-- Signup Form -->
+            <form id="signupForm" style="display:none; flex-direction:column; gap:16px;">
+              <div class="auth-form-group">
+                <label for="signupUser">Choose Username</label>
+                <input type="text" id="signupUser" class="auth-input" placeholder="e.g. jdoe123" required minlength="3">
+              </div>
+              <div class="auth-form-group">
+                <label for="signupPass">Choose Password</label>
+                <input type="password" id="signupPass" class="auth-input" placeholder="••••••••" required minlength="6">
+              </div>
+              <button type="submit" class="auth-submit-btn">Create Account</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Logged In View -->
+        <div id="userProfileContainer" class="auth-container" style="display:none;">
+          <div class="user-profile-panel">
+            <div class="user-avatar" id="profileAvatar">A</div>
+            <h2 id="profileUsername" style="font-size:1.8rem; margin-bottom:4px;">Username</h2>
+            <div class="user-role-badge" id="profileRole">User</div>
+            
+            <p style="color:var(--text-2); font-size:0.9rem; margin-top:24px; margin-bottom:24px; line-height:1.5;">
+              You are currently logged in. <br>
+              <span id="profileAdminText" style="display:none;">As an Admin, you can add teams, schedule matches, and record live scores.</span>
+            </p>
+            
+            <button class="secondary-btn" onclick="logoutUser()" style="width:100%; border-radius:var(--r-full); padding:12px;">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       MODAL: ADMIN LOGIN
+  ════════════════════════════════════════ -->
+  <div class="modal-overlay" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="loginModalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="loginModalTitle">
+          <i class="fa-solid fa-lock" style="color:var(--green);margin-right:8px;font-size:0.95rem;"></i>
+          Admin Access
+        </h2>
+        <button class="close-modal-btn" onclick="closeModal('loginModal')" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="loginForm" autocomplete="off">
+          <div class="form-group">
+            <label for="loginUser">Username</label>
+            <input type="text" id="loginUser" class="form-control" value="admin" required autocomplete="username">
+          </div>
+          <div class="form-group">
+            <label for="loginPass">Password</label>
+            <input type="password" id="loginPass" class="form-control" placeholder="Default: admin123" required autocomplete="current-password">
+          </div>
+          <div id="loginError" class="form-error-msg hide"></div>
+          <button type="submit" class="primary-btn block-btn" style="margin-top:6px;">
+            <i class="fa-solid fa-unlock"></i> Unlock Admin
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       MODAL: TEAM FORM
+  ════════════════════════════════════════ -->
+  <div class="modal-overlay" id="teamModal" role="dialog" aria-modal="true" aria-labelledby="teamModalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="teamModalTitle">
+          <i class="fa-solid fa-shield-halved" style="color:var(--green);margin-right:8px;font-size:0.95rem;"></i>
+          Add New Team
+        </h2>
+        <button class="close-modal-btn" onclick="closeModal('teamModal')" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="teamForm">
+          <input type="hidden" id="teamIdField">
+          <div class="form-group">
+            <label for="teamNameField">Team Name</label>
+            <input type="text" id="teamNameField" class="form-control" placeholder="e.g. India" required>
+          </div>
+          <div class="form-group">
+            <label for="teamCaptainField">Captain Name</label>
+            <input type="text" id="teamCaptainField" class="form-control" placeholder="e.g. Rohit Sharma" required>
+          </div>
+          <div class="form-group">
+            <label for="teamCoachField">Head Coach</label>
+            <input type="text" id="teamCoachField" class="form-control" placeholder="e.g. Rahul Dravid" required>
+          </div>
+          <div id="teamError" class="form-error-msg hide"></div>
+          <button type="submit" class="primary-btn block-btn" id="teamSubmitBtn">
+            <i class="fa-solid fa-plus"></i> Create Team
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       MODAL: PLAYER FORM
+  ════════════════════════════════════════ -->
+  <div class="modal-overlay" id="playerModal" role="dialog" aria-modal="true" aria-labelledby="playerModalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="playerModalTitle">
+          <i class="fa-solid fa-user-ninja" style="color:var(--green);margin-right:8px;font-size:0.95rem;"></i>
+          Add New Player
+        </h2>
+        <button class="close-modal-btn" onclick="closeModal('playerModal')" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="playerForm">
+          <input type="hidden" id="playerIdField">
+          <div class="form-group">
+            <label for="playerNameField">Player Name</label>
+            <input type="text" id="playerNameField" class="form-control" placeholder="e.g. Virat Kohli" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-6">
+              <label for="playerAgeField">Age (15–60)</label>
+              <input type="number" id="playerAgeField" class="form-control" min="15" max="60" required>
+            </div>
+            <div class="form-group col-6">
+              <label for="playerRoleField">Playing Role</label>
+              <select id="playerRoleField" class="form-control" required>
+                <option value="batsman">Batsman</option>
+                <option value="bowler">Bowler</option>
+                <option value="all-rounder">All-Rounder</option>
+                <option value="wicket keeper">Wicket Keeper</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="playerTeamField">Assign Team</label>
+            <select id="playerTeamField" class="form-control" required>
+              <option value="">Select team...</option>
+            </select>
+          </div>
+          <div id="playerError" class="form-error-msg hide"></div>
+          <button type="submit" class="primary-btn block-btn" id="playerSubmitBtn">
+            <i class="fa-solid fa-user-plus"></i> Add Player
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       MODAL: MATCH FORM
+  ════════════════════════════════════════ -->
+  <div class="modal-overlay" id="matchModal" role="dialog" aria-modal="true" aria-labelledby="matchModalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="matchModalTitle">
+          <i class="fa-solid fa-calendar-days" style="color:var(--green);margin-right:8px;font-size:0.95rem;"></i>
+          Schedule Match
+        </h2>
+        <button class="close-modal-btn" onclick="closeModal('matchModal')" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="matchForm">
+          <input type="hidden" id="matchIdField">
+          <div class="form-row">
+            <div class="form-group col-6">
+              <label for="matchTeam1Field">Team 1</label>
+              <select id="matchTeam1Field" class="form-control" required>
+                <option value="">Select Team 1...</option>
+              </select>
+            </div>
+            <div class="form-group col-6">
+              <label for="matchTeam2Field">Team 2</label>
+              <select id="matchTeam2Field" class="form-control" required>
+                <option value="">Select Team 2...</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-6">
+              <label for="matchDateField">Match Date</label>
+              <input type="date" id="matchDateField" class="form-control" required>
+            </div>
+            <div class="form-group col-6">
+              <label for="matchStatusField">Status</label>
+              <select id="matchStatusField" class="form-control" required>
+                <option value="scheduled">Scheduled</option>
+                <option value="live">Live</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="matchVenueField">Venue</label>
+            <input type="text" id="matchVenueField" class="form-control" placeholder="e.g. Wankhede Stadium, Mumbai" required>
+          </div>
+          <div class="form-group hide" id="matchWinnerGroup">
+            <label for="matchWinnerField">Match Winner</label>
+            <select id="matchWinnerField" class="form-control">
+              <option value="">Tie / Draw / No Result</option>
+            </select>
+          </div>
+          <div id="matchError" class="form-error-msg hide"></div>
+          <button type="submit" class="primary-btn block-btn" id="matchSubmitBtn">
+            <i class="fa-solid fa-calendar-plus"></i> Schedule Match
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notifications -->
+  <div class="toast-container" id="toastContainer" aria-live="assertive" aria-atomic="true"></div>
+
+  <!-- ════════════════════════════════════════
+       IPL LIVE SCORING PANEL
+  ════════════════════════════════════════ -->
+  <div class="ipl-modal-overlay" id="iplScoringModal" role="dialog" aria-modal="true" aria-labelledby="iplModalTitle">
+    <div class="ipl-panel">
+
+      <!-- Header -->
+      <div class="ipl-header">
+        <div class="ipl-header-title">
+          <h2 id="iplModalTitle"><i class="fa-solid fa-tower-broadcast" style="color:var(--green);margin-right:8px;"></i>Live Scoring — IPL Mode</h2>
+          <span id="iplMatchSubtitle">Select innings setup on the right to begin</span>
+        </div>
+        <div class="ipl-header-actions">
+          <button class="secondary-btn" id="iplSaveFinalBtn" style="font-size:0.82rem;" disabled>
+            <i class="fa-solid fa-floppy-disk"></i> Save &amp; Finish
+          </button>
+          <button class="ipl-close-btn" onclick="closeIPLScoring()">
+            <i class="fa-solid fa-xmark"></i> Close
+          </button>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="ipl-body">
+
+        <!-- LEFT: Scoring Controls -->
+        <div class="ipl-left">
+
+          <!-- Big Score Display -->
+          <div class="ipl-score-display">
+            <div class="ipl-batting-team" id="iplBattingTeamName">— Select Innings Setup —</div>
+            <div class="ipl-total-score">
+              <span id="iplTotalRuns">0</span><span class="ipl-wickets">/<span id="iplTotalWickets">0</span></span>
+            </div>
+            <div class="ipl-overs-crr">
+              <span>Overs: <strong id="iplOversDisplay">0.0</strong></span>
+              <span class="ipl-crr-badge">CRR: <span id="iplCRR">0.00</span></span>
+              <span>Extras: <strong id="iplExtras">0</strong></span>
+            </div>
+          </div>
+
+          <!-- Current Over Visualization -->
+          <div class="ipl-over-section">
+            <div class="ipl-over-label">This Over — <span id="iplOverNumber">Over 1</span></div>
+            <div class="ipl-over-balls" id="iplOverBalls">
+              <div class="ipl-ball empty"></div>
+              <div class="ipl-ball empty"></div>
+              <div class="ipl-ball empty"></div>
+              <div class="ipl-ball empty"></div>
+              <div class="ipl-ball empty"></div>
+              <div class="ipl-ball empty"></div>
+            </div>
+          </div>
+
+          <!-- Ball Action Buttons -->
+          <div class="ipl-ball-actions">
+            <div class="ipl-ball-actions-label">Tap to record delivery outcome</div>
+
+            <!-- Main Run Buttons -->
+            <div class="ipl-btn-grid">
+              <button class="ipl-action-btn btn-dot" id="iplBtn0" onclick="recordBall('dot')" disabled>
+                <span>•</span>
+                <span class="btn-sublabel">Dot Ball</span>
+              </button>
+              <button class="ipl-action-btn btn-1" id="iplBtn1" onclick="recordBall(1)" disabled>
+                <span>1</span>
+                <span class="btn-sublabel">Single</span>
+              </button>
+              <button class="ipl-action-btn btn-2" id="iplBtn2" onclick="recordBall(2)" disabled>
+                <span>2</span>
+                <span class="btn-sublabel">Double</span>
+              </button>
+              <button class="ipl-action-btn btn-3" id="iplBtn3" onclick="recordBall(3)" disabled>
+                <span>3</span>
+                <span class="btn-sublabel">Triple</span>
+              </button>
+              <button class="ipl-action-btn btn-4" id="iplBtn4" onclick="recordBall(4)" disabled>
+                <span>4</span>
+                <span class="btn-sublabel">Boundary</span>
+              </button>
+              <button class="ipl-action-btn btn-6" id="iplBtn6" onclick="recordBall(6)" disabled>
+                <span>6</span>
+                <span class="btn-sublabel">Maximum</span>
+              </button>
+              <button class="ipl-action-btn btn-out" id="iplBtnOut" onclick="recordBall('out')" disabled>
+                <span>W</span>
+                <span class="btn-sublabel">Wicket</span>
+              </button>
+              <button class="ipl-action-btn btn-dot" id="iplBtnMiss" onclick="recordBall('miss')" disabled>
+                <span style="font-size:1rem;">MISS</span>
+                <span class="btn-sublabel">Beaten</span>
+              </button>
+            </div>
+
+            <!-- Extras Row -->
+            <div style="margin: 12px 0 8px; font-size:0.68rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-4);">Extras</div>
+            <div class="ipl-btn-grid extras-row">
+              <button class="ipl-action-btn btn-wide" id="iplBtnWide" onclick="recordBall('wide')" disabled>
+                <span>WD</span>
+                <span class="btn-sublabel">Wide</span>
+              </button>
+              <button class="ipl-action-btn btn-nb" id="iplBtnNB" onclick="recordBall('noball')" disabled>
+                <span>NB</span>
+                <span class="btn-sublabel">No Ball</span>
+              </button>
+              <button class="ipl-action-btn btn-bye" id="iplBtnBye" onclick="recordBall('bye')" disabled>
+                <span>B</span>
+                <span class="btn-sublabel">Bye</span>
+              </button>
+              <button class="ipl-action-btn btn-lb" id="iplBtnLB" onclick="recordBall('legbye')" disabled>
+                <span>LB</span>
+                <span class="btn-sublabel">Leg Bye</span>
+              </button>
+            </div>
+
+            <div class="ipl-undo-row">
+              <button class="ipl-undo-btn" onclick="undoLastBall()" id="iplUndoBtn">
+                <i class="fa-solid fa-rotate-left"></i> Undo Last Ball
+              </button>
+            </div>
+          </div>
+
+          <!-- Over History -->
+          <div class="ipl-over-section">
+            <div class="ipl-over-label">Completed Overs</div>
+            <div id="iplOverHistory" class="ipl-over-history">
+              <div style="font-size:0.8rem;color:var(--text-4);text-align:center;padding:10px 0;">No completed overs yet</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT: Setup + Live Stats -->
+        <div class="ipl-right">
+
+          <!-- SETUP PANEL (shown before scoring starts) -->
+          <div id="iplSetupPanel" class="ipl-setup-panel">
+            <div class="ipl-setup-title"><i class="fa-solid fa-sliders"></i> Innings Setup</div>
+
+            <div class="ipl-setup-group">
+              <div class="ipl-setup-group-label">Batting Team</div>
+              <select class="ipl-select" id="iplBattingTeamSelect">
+                <option value="">Select batting team...</option>
+              </select>
+
+              <div class="ipl-setup-group-label" style="margin-top:4px;">Striker (Batsman on strike)</div>
+              <select class="ipl-select" id="iplStrikerSelect">
+                <option value="">Select striker...</option>
+              </select>
+
+              <div class="ipl-setup-group-label" style="margin-top:4px;">Non-Striker</div>
+              <select class="ipl-select" id="iplNonStrikerSelect">
+                <option value="">Select non-striker...</option>
+              </select>
+            </div>
+
+            <div class="ipl-setup-group">
+              <div class="ipl-setup-group-label">Bowler</div>
+              <select class="ipl-select" id="iplBowlerSelect">
+                <option value="">Select bowler...</option>
+              </select>
+            </div>
+
+            <button class="ipl-start-btn" id="iplStartBtn" onclick="startIPLScoring()">
+              <i class="fa-solid fa-play"></i> Begin Scoring
+            </button>
+          </div>
+
+          <!-- LIVE STATS PANEL (shown during scoring) -->
+          <div id="iplLivePanel" style="display:none; flex-direction:column; gap:14px;">
+
+            <div class="ipl-section-label">At The Crease</div>
+
+            <!-- Striker -->
+            <div class="ipl-batsman-card on-strike" id="iplStrikerCard">
+              <div class="ipl-batsman-info">
+                <div class="ipl-batsman-name">
+                  <i class="fa-solid fa-cricket-bat-ball strike-icon"></i>
+                  <span id="iplStrikerName">—</span>
+                </div>
+                <div class="ipl-batsman-stats" id="iplStrikerRole">Batsman</div>
+              </div>
+              <div class="ipl-batsman-score">
+                <div class="ipl-batsman-runs" id="iplStrikerRuns">0</div>
+                <div class="ipl-batsman-balls"><span id="iplStrikerBalls">0</span>b</div>
+                <div class="ipl-batsman-sr" id="iplStrikerSR">SR: 0.00</div>
+              </div>
+            </div>
+
+            <!-- Non-Striker -->
+            <div class="ipl-batsman-card" id="iplNonStrikerCard">
+              <div class="ipl-batsman-info">
+                <div class="ipl-batsman-name">
+                  <span id="iplNonStrikerName">—</span>
+                </div>
+                <div class="ipl-batsman-stats" id="iplNonStrikerRole">Non-Striker</div>
+              </div>
+              <div class="ipl-batsman-score">
+                <div class="ipl-batsman-runs" id="iplNonStrikerRuns">0</div>
+                <div class="ipl-batsman-balls"><span id="iplNonStrikerBalls">0</span>b</div>
+                <div class="ipl-batsman-sr" id="iplNonStrikerSR">SR: 0.00</div>
+              </div>
+            </div>
+
+            <div class="ipl-section-label" style="margin-top:6px;">Bowling</div>
+
+            <!-- Bowler -->
+            <div class="ipl-bowler-card">
+              <div>
+                <div class="ipl-bowler-name-label">Bowler</div>
+                <div class="ipl-bowler-name" id="iplBowlerName">—</div>
+                <div class="ipl-bowler-stats" id="iplBowlerStats">0-0 (0.0)</div>
+              </div>
+              <div class="ipl-bowler-figures">
+                <div class="ipl-bowler-main-stat" id="iplBowlerFigures">0/0</div>
+              </div>
+            </div>
+
+            <button class="ipl-end-over-btn" id="iplEndOverBtn" onclick="endOver()" disabled>
+              <i class="fa-solid fa-arrow-right-arrow-left"></i> End Over &amp; Change Bowler
+            </button>
+
+            <hr style="border:0;border-top:1px solid var(--divider);">
+
+            <div class="ipl-section-label">Change Batsman</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <select class="ipl-select" id="iplNewBatsmanSelect" style="font-size:0.8rem;">
+                <option value="">New batsman coming in...</option>
+              </select>
+              <button class="ipl-end-over-btn" style="border-color:rgba(0,214,143,0.3);color:var(--green);background:rgba(0,214,143,0.05);" onclick="swapBatsman()">
+                <i class="fa-solid fa-person-walking"></i> Send In New Batsman
+              </button>
+            </div>
+
+            <button class="ipl-save-btn" id="iplSaveSessionBtn" onclick="saveIPLSession()">
+              <i class="fa-solid fa-floppy-disk"></i> Save Scoring Session
+            </button>
+
+          </div>
+
+          <!-- Wicket Overlay (shown when wicket recorded, needs new batsman) -->
+          <div id="iplWicketOverlay" style="display:none;background:rgba(255,69,58,0.05);border:1px solid rgba(255,69,58,0.2);border-radius:var(--r-md);padding:18px;text-align:center;">
+            <div style="font-size:2rem;margin-bottom:8px;">🏏 WICKET!</div>
+            <div style="font-weight:700;color:var(--red);margin-bottom:4px;" id="iplWicketMsg">Player is out!</div>
+            <div style="font-size:0.82rem;color:var(--text-2);margin-bottom:16px;">Select new batsman from above to continue</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- App JavaScript -->
+  <script src="js/app.js"></script>
+  <script src="js/ipl-scoring.js"></script>
+</body>
+</html>
