@@ -126,11 +126,89 @@ async function initSQLite() {
   for (const stmt of statements) {
     await queryInterface.query(stmt);
   }
+  
+  await seedDatabase('SQLite');
+}
 
+// Initialize MySQL database schema
+async function initMySQL() {
+  const schemaSql = `
+    CREATE TABLE IF NOT EXISTS teams (
+        team_id INT PRIMARY KEY AUTO_INCREMENT,
+        team_name VARCHAR(255) NOT NULL UNIQUE,
+        captain VARCHAR(255) NOT NULL,
+        coach VARCHAR(255) NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS players (
+        player_id INT PRIMARY KEY AUTO_INCREMENT,
+        player_name VARCHAR(255) NOT NULL,
+        age INT NOT NULL CHECK (age >= 15 AND age <= 60),
+        role ENUM('batsman', 'bowler', 'all-rounder', 'wicket keeper') NOT NULL,
+        team_id INT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (team_id) REFERENCES teams(team_id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS matches (
+        match_id INT PRIMARY KEY AUTO_INCREMENT,
+        team1_id INT NOT NULL,
+        team2_id INT NOT NULL,
+        match_date DATE NOT NULL,
+        venue VARCHAR(255) NOT NULL,
+        winner_id INT DEFAULT NULL,
+        status ENUM('scheduled', 'live', 'completed') DEFAULT 'scheduled',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (team1_id) REFERENCES teams(team_id) ON DELETE CASCADE,
+        FOREIGN KEY (team2_id) REFERENCES teams(team_id) ON DELETE CASCADE,
+        FOREIGN KEY (winner_id) REFERENCES teams(team_id) ON DELETE SET NULL,
+        CONSTRAINT chk_different_teams CHECK (team1_id <> team2_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS player_performances (
+        performance_id INT PRIMARY KEY AUTO_INCREMENT,
+        match_id INT NOT NULL,
+        player_id INT NOT NULL,
+        runs_scored INT DEFAULT 0 CHECK (runs_scored >= 0),
+        balls_faced INT DEFAULT 0 CHECK (balls_faced >= 0),
+        fours INT DEFAULT 0 CHECK (fours >= 0),
+        sixes INT DEFAULT 0 CHECK (sixes >= 0),
+        wickets_taken INT DEFAULT 0 CHECK (wickets_taken >= 0),
+        overs_bowled FLOAT DEFAULT 0.0 CHECK (overs_bowled >= 0.0),
+        runs_conceded INT DEFAULT 0 CHECK (runs_conceded >= 0),
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (match_id) REFERENCES matches(match_id) ON DELETE CASCADE,
+        FOREIGN KEY (player_id) REFERENCES players(player_id) ON DELETE CASCADE,
+        UNIQUE (match_id, player_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS users (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        username VARCHAR(255) NOT NULL UNIQUE,
+        password_hash VARCHAR(255) NOT NULL,
+        role ENUM('user', 'admin') DEFAULT 'user',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
+
+  const statements = schemaSql.split(';').map(s => s.trim()).filter(Boolean);
+  for (const stmt of statements) {
+    await queryInterface.query(stmt);
+  }
+  
+  await seedDatabase('MySQL');
+}
+
+// Shared seeder for both databases
+async function seedDatabase(dbName) {
   // Check if we need to seed
   const teams = await queryInterface.query('SELECT COUNT(*) as count FROM teams');
-  if (teams[0].count === 0) {
-    console.log('SQLite database is empty. Seeding initial data...');
+  // Handle different count output formats between sqlite (returns objects) and mysql (returns array of objects)
+  const teamCount = teams[0].count !== undefined ? teams[0].count : (teams[0]['COUNT(*)'] || 0);
+  
+  if (teamCount === 0) {
+    console.log(`${dbName} database is empty. Seeding initial data...`);
     
     // Seed Teams
     await queryInterface.query(`
@@ -235,17 +313,19 @@ async function initSQLite() {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
       `, perf);
     }
-    console.log('SQLite database seeded successfully.');
+    console.log(`${dbName} database seeded successfully.`);
   }
   
   // Seed admin user if it doesn't exist
-  const usersCount = await queryInterface.query('SELECT COUNT(*) as count FROM users WHERE role = "admin"');
-  if (usersCount[0].count === 0) {
+  const usersCountData = await queryInterface.query('SELECT COUNT(*) as count FROM users WHERE role = "admin"');
+  const uCount = usersCountData[0].count !== undefined ? usersCountData[0].count : (usersCountData[0]['COUNT(*)'] || 0);
+  
+  if (uCount === 0) {
     const bcrypt = require('bcryptjs');
     const adminPass = process.env.ADMIN_PASSWORD || 'admin123';
     const hash = await bcrypt.hash(adminPass, 10);
     await queryInterface.query('INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)', ['admin', hash, 'admin']);
-    console.log('Admin user seeded.');
+    console.log(`Admin user seeded for ${dbName}.`);
   }
 }
 
@@ -262,6 +342,13 @@ if (dbType === 'mysql') {
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
+  });
+  
+  // Initialize tables after connection
+  initMySQL().then(() => {
+    console.log('MySQL Database initialized successfully.');
+  }).catch(err => {
+    console.error('Failed to initialize MySQL Database:', err);
   });
 } else {
   console.log('Using SQLite Database (cricket.db)...');
